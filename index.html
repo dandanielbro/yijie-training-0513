@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="將錄音檔整理成依序分段、附重點標示與通順逐字稿的靜態網頁。">
+  <title>Jarvis Transcript Pages</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Serif+TC:wght@400;500;700&family=IBM+Plex+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page-aura" aria-hidden="true"></div>
+
+  <div class="page-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Audio to Chronicle</p>
+        <h1 id="page-title">載入逐字稿中</h1>
+        <p class="hero-lede" id="page-subtitle">整理後的逐字稿會依原始講述順序展開，保留語氣與脈絡，同時補上標題與重點。</p>
+        <div class="meta-row" id="meta-row"></div>
+        <div class="audio-panel" id="audio-panel" hidden>
+          <div class="audio-panel-head">
+            <p class="card-kicker">原始音檔</p>
+            <a id="audio-download" href="#" download hidden>下載音檔</a>
+          </div>
+          <audio id="audio-player" controls preload="none"></audio>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="rail">
+        <section class="rail-panel">
+          <p class="rail-kicker">總覽</p>
+          <h2>重點摘要</h2>
+          <ul class="summary-list" id="summary-list"></ul>
+        </section>
+
+        <details class="rail-panel toc-panel">
+          <summary class="toc-toggle">
+            <span>
+              <span class="rail-kicker">段落導覽</span>
+              <strong>顯示目錄</strong>
+            </span>
+            <span class="toc-toggle-icon" aria-hidden="true"></span>
+          </summary>
+          <nav class="section-nav" aria-label="段落導覽">
+            <div id="section-nav"></div>
+          </nav>
+        </details>
+      </aside>
+
+      <section class="content">
+        <div class="content-intro">
+          <div>
+            <p class="section-kicker">Chronological Transcript</p>
+            <h2>依序整理的逐字稿</h2>
+          </div>
+          <p class="content-note" id="content-note"></p>
+        </div>
+
+        <div class="sections" id="sections"></div>
+      </section>
+    </main>
+  </div>
+
+  <template id="section-template">
+    <article class="segment-card">
+      <div class="segment-frame">
+        <div class="segment-index"></div>
+        <div class="segment-body">
+          <header class="segment-header">
+            <div>
+              <p class="segment-kicker"></p>
+              <h3 class="segment-title"></h3>
+            </div>
+            <div class="segment-meta"></div>
+          </header>
+
+          <p class="segment-focus"></p>
+
+          <div class="highlight-block">
+            <p class="block-label">本段重點</p>
+            <ul class="highlight-list"></ul>
+          </div>
+
+          <blockquote class="quote-block" hidden>
+            <p class="block-label">保留語氣</p>
+            <p class="quote-text"></p>
+          </blockquote>
+
+          <div class="transcript-block">
+            <p class="block-label">整理後逐字稿</p>
+            <div class="transcript-paragraphs"></div>
+          </div>
+
+          <div class="voice-note" hidden>
+            <p class="block-label">語氣備註</p>
+            <p class="voice-note-text"></p>
+          </div>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script src="./content/transcript.inline.js" defer></script>
+  <script src="./app.js" defer></script>
+</body>
+</html>
