@@ -1,0 +1,57 @@
+{
+  "preferred_terms": [
+    {
+      "canonical": "怡潔",
+      "aliases": ["宜潔", "怡婕", "怡杰", "儀潔"]
+    },
+    {
+      "canonical": "德奕",
+      "aliases": ["得意", "德義", "德毅"]
+    },
+    {
+      "canonical": "緯麒",
+      "aliases": ["偉祺", "維麒", "瑋麒", "偉麒"]
+    },
+    {
+      "canonical": "KASH",
+      "aliases": ["cash", "凱許", "K A S H"]
+    },
+    {
+      "canonical": "新人問卷",
+      "aliases": ["新人問卷表", "新人表單"]
+    },
+    {
+      "canonical": "人生觀",
+      "aliases": ["人生關", "人生價值觀"]
+    },
+    {
+      "canonical": "需求分析",
+      "aliases": ["需求分折", "需求評估"]
+    },
+    {
+      "canonical": "建議書",
+      "aliases": ["建議方案", "規劃書"]
+    },
+    {
+      "canonical": "理賠",
+      "aliases": ["理陪"]
+    },
+    {
+      "canonical": "壽險",
+      "aliases": ["受險"]
+    },
+    {
+      "canonical": "風險轉嫁",
+      "aliases": ["風險轉價", "風險轉移"]
+    },
+    {
+      "canonical": "資產分配",
+      "aliases": ["資產配置"]
+    }
+  ],
+  "notes": [
+    "若個別學員發言無法高信心辨識是德奕或緯麒，正文可先標成「學員」。",
+    "若上下文明確指出主講者是怡潔，請直接使用「怡潔」，不要退回泛稱。",
+    "保險訓練相關語境優先使用常見繁體中文專業寫法。"
+  ]
+}

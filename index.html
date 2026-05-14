@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="將錄音檔整理成依序分段、附重點標示與通順逐字稿的靜態網頁。">
   <title>Jarvis Transcript Pages</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Serif+TC:wght@400;500;700&family=IBM+Plex+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
@@ -34,7 +31,7 @@
       <aside class="rail">
         <section class="rail-panel">
           <p class="rail-kicker">總覽</p>
-          <h2>重點摘要</h2>
+          <h2>快速導讀</h2>
           <ul class="summary-list" id="summary-list"></ul>
         </section>
 
@@ -81,11 +78,6 @@
 
           <p class="segment-focus"></p>
 
-          <div class="highlight-block">
-            <p class="block-label">本段重點</p>
-            <ul class="highlight-list"></ul>
-          </div>
-
           <blockquote class="quote-block" hidden>
             <p class="block-label">保留語氣</p>
             <p class="quote-text"></p>
@@ -94,6 +86,16 @@
           <div class="transcript-block">
             <p class="block-label">整理後逐字稿</p>
             <div class="transcript-paragraphs"></div>
+          </div>
+
+          <div class="closing-summary" hidden>
+            <p class="block-label">段尾整理</p>
+            <p class="closing-summary-text"></p>
+          </div>
+
+          <div class="highlight-block">
+            <p class="block-label">本段重點</p>
+            <ul class="highlight-list"></ul>
           </div>
 
           <div class="voice-note" hidden>

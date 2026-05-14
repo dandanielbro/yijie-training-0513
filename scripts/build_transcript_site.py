@@ -32,6 +32,7 @@ DEFAULT_MODEL = "gemini-2.0-flash"
 DEFAULT_CHUNK_SECONDS = 420
 TRANSCRIBE_TEMPERATURE = 0.2
 STRUCTURE_TEMPERATURE = 0.4
+GLOSSARY_RELATIVE_PATH = Path("content/terminology-glossary.json")
 
 
 def die(message: str, code: int = 1) -> None:
@@ -58,6 +59,38 @@ def ensure_api_key() -> str:
     if not key:
         die("GEMINI_API_KEY is not set.")
     return key
+
+
+def load_glossary(site_dir: Path) -> dict:
+    glossary_path = site_dir / GLOSSARY_RELATIVE_PATH
+    if not glossary_path.exists():
+        return {}
+    try:
+        return json.loads(glossary_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as error:
+        die(f"Invalid glossary JSON: {glossary_path} ({error})")
+
+
+def render_glossary_prompt(glossary: dict) -> str:
+    preferred_terms = glossary.get("preferred_terms") or []
+    notes = glossary.get("notes") or []
+    if not preferred_terms and not notes:
+        return "目前沒有提供額外專有名詞庫。"
+
+    lines = ["本次整理請優先參考以下專有名詞與寫法："]
+
+    for item in preferred_terms:
+        canonical = item.get("canonical", "").strip()
+        aliases = [alias.strip() for alias in item.get("aliases", []) if alias.strip()]
+        if not canonical:
+            continue
+        alias_text = f"（常見誤寫：{', '.join(aliases)}）" if aliases else ""
+        lines.append(f"- {canonical}{alias_text}")
+
+    for note in notes:
+        lines.append(f"- 備註：{note}")
+
+    return "\n".join(lines)
 
 
 def ensure_wav(audio_path: Path, wav_path: Path) -> None:
@@ -182,6 +215,7 @@ def transcribe_chunk(
     total_chunks: int,
     start_seconds: float,
     end_seconds: float,
+    glossary_prompt: str,
 ) -> str:
     audio_data = base64.b64encode(chunk_path.read_bytes()).decode("ascii")
     prompt = textwrap.dedent(
@@ -195,6 +229,8 @@ def transcribe_chunk(
         4. 刪除明顯贅字、重複口頭禪與無意義停頓，但不要過度潤稿。
         5. 若有聽不清楚的地方，可用最合理的詞推定，但不要胡亂補內容。
         6. 這是整段錄音的第 {chunk_index} / {total_chunks} 段，時間範圍約 {format_seconds(start_seconds)} - {format_seconds(end_seconds)}。
+        7. 優先遵守以下專有名詞庫與寫法：
+        {glossary_prompt}
         """
     ).strip()
     return gemini_generate(
@@ -290,6 +326,7 @@ def structure_transcript(
     recorded_at: str,
     duration: str,
     transcript_text: str,
+    glossary_prompt: str,
 ) -> dict:
     prompt = textwrap.dedent(
         f"""
@@ -320,11 +357,13 @@ def structure_transcript(
               "kicker": string,
               "title": string,
               "focus": string,
+              "kind": string,
               "timeRange": string,
               "tag": string,
               "highlights": string[],
               "quote": string,
               "transcript": string[],
+              "closingSummary": string,
               "voiceNote": string
             }}
           ]
@@ -338,8 +377,13 @@ def structure_transcript(
         5. 可修正明顯不合理辨識詞，但不要擅自新增沒說過的內容。
         6. `title` 請基於內容與檔名 `{title}` 命名，不要保留模板字樣。
         7. `meta.recordedAt` 固定填 `{recorded_at}`，`meta.duration` 固定填 `{duration}`，`audio.url` 固定填 `./media/original.mp3`。
-        8. 如果講者身份不明，`speaker` 可填「待確認」。
+        8. 如果講者身份不明，逐句不要硬配姓名；可用「學員」等保守標示。
         9. `status` 請填「已完成自動整理初稿」。
+        10. 正文優先，不要把整段寫成摘要。
+        11. 若該段有來回問答，請保留 Q&A 在 transcript 正文裡，並可將 `kind` 填成 `Q&A`。
+        12. 段尾整理請放進 `closingSummary`，不要把「段落小結：」混進 transcript 陣列。
+        13. 優先遵守以下專有名詞庫與寫法：
+        {glossary_prompt}
 
         逐字稿如下：
         {transcript_text}
@@ -356,6 +400,7 @@ def write_chunk_transcripts(
     output_dir: Path,
     chunk_seconds: int,
     max_chunks: int | None,
+    glossary_prompt: str,
 ) -> tuple[list[str], list[Path]]:
     output_dir.mkdir(parents=True, exist_ok=True)
     transcripts: list[str] = []
@@ -383,6 +428,7 @@ def write_chunk_transcripts(
             len(selected_chunk_paths),
             start_seconds,
             end_seconds,
+            glossary_prompt,
         )
         transcript_path.write_text(text.strip() + "\n", encoding="utf-8")
         transcripts.append(text.strip())
@@ -413,6 +459,8 @@ def main() -> None:
     transcript_dir = output_dir / "chunk-transcripts"
     combined_transcript_path = output_dir / "combined-transcript.txt"
     transcript_json_path = content_dir / "transcript.json"
+    glossary = load_glossary(site_dir)
+    glossary_prompt = render_glossary_prompt(glossary)
 
     ensure_wav(audio_path, wav_path)
     duration_seconds = audio_duration_seconds(wav_path)
@@ -428,6 +476,7 @@ def main() -> None:
         transcript_dir,
         args.chunk_seconds,
         args.max_chunks or None,
+        glossary_prompt,
     )
 
     combined_transcript = "\n\n".join(
@@ -450,6 +499,7 @@ def main() -> None:
             recorded_at,
             duration_text,
             combined_transcript,
+            glossary_prompt,
         )
     except Exception as error:
         log(f"Structured JSON generation failed, using fallback: {error}")

@@ -4,7 +4,7 @@
 
 - 錄音檔轉錄結果
 - 整理後的逐字稿
-- 依講話順序整理的段落標題與重點
+- 依講話順序整理的段落標題、Q&A 與段尾重點
 
 ## 目前已完成
 
@@ -12,20 +12,31 @@
 - `styles.css`：編排與視覺設計
 - `app.js`：從 `content/transcript.json` 讀資料並渲染
 - `content/transcript.json`：逐字稿內容模板
+- `content/terminology-glossary.json`：專有名詞與常見辨識修正候選
 
 ## 內容格式
 
-核心資料在 [content/transcript.json](/Users/dan/Desktop/super-assistant/projects/audio-transcript-pages/content/transcript.json)。
+核心資料在 [transcript.json](/Users/dan/Desktop/super-assistant/projects/yijie-home-transcript-site/content/transcript.json)。
 
 每個 `section` 代表一個依時間順序整理出的段落，建議欄位：
 
 - `title`：段落標題
 - `focus`：本段一句話摘要
+- `kind`：可選，像是 `Q&A`
 - `timeRange`：若有時間碼可填
 - `highlights`：本段重點列表
 - `quote`：保留語氣的一句原話
 - `transcript`：整理後逐字稿段落陣列
+- `closingSummary`：段尾整理；若缺省，頁面會自動把最後一行 `段落小結：` 拆出來
 - `voiceNote`：語氣或情境備註
+
+## 目前採用的整理原則
+
+- 正文優先，不把整段改寫成摘要
+- 若原始內容是來回問答，保留在正文結構裡
+- 段尾整理與本段重點放在正文之後
+- 若講者無法高信心辨識，寧可用保守標示，不硬配姓名
+- 專有名詞先看 `content/terminology-glossary.json`，再做上下文修正
 
 ## 本機預覽
 
@@ -37,25 +48,17 @@ python3 -m http.server 8123
 
 然後打開：
 
-- `http://localhost:8123/projects/audio-transcript-pages/`
+- `http://127.0.0.1:8125/projects/yijie-home-transcript-site/`
 
 ## 轉錄現況
 
-這個 workspace 目前尚未具備直接轉錄所需條件：
+建站腳本在 [build_transcript_site.py](/Users/dan/Desktop/super-assistant/projects/yijie-home-transcript-site/scripts/build_transcript_site.py)，目前會：
 
-- `OPENAI_API_KEY` 尚未在目前 shell 環境中設定
-- `~/.codex/skills/transcribe/scripts/transcribe_diarize.py` 目前不存在
-- 本機也尚未安裝 `whisper` 或 `ffmpeg`
-
-因此下一步有兩種路徑：
-
-1. 使用 OpenAI 轉錄流程：先把環境補齊，再對上傳的音檔做轉錄。
-2. 若你已有初步逐字稿：可直接整理後填入 `content/transcript.json`，立即產出頁面。
+1. 切音訊 chunk
+2. 轉出逐字稿
+3. 讀取 `content/terminology-glossary.json`
+4. 產出偏逐字稿導向的 `content/transcript.json`
 
 ## GitHub Pages
 
-因為這個 workspace 目前不是一個已連到 GitHub 的 repo，所以我先把「可部署的靜態站內容」建好。等你要正式發布時，可以：
-
-1. 把 `projects/audio-transcript-pages/` 放進目標 repo。
-2. 在 GitHub Pages 設定中指定這個資料夾對應的 branch / root。
-3. 或者我之後再幫你補成獨立 repo 與自動部署流程。
+目前這個專案本身已經是獨立 repo，可直接部署到 GitHub Pages。

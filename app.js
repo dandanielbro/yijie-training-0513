@@ -13,6 +13,58 @@ async function loadTranscript() {
   }
 }
 
+function normalizeSpeakerClass(speaker) {
+  const normalized = (speaker || "").trim();
+  if (normalized === "怡潔") {
+    return "speaker-yijie";
+  }
+  if (normalized === "德奕") {
+    return "speaker-deyi";
+  }
+  if (normalized === "緯麒") {
+    return "speaker-weiqi";
+  }
+  if (normalized === "學員" || normalized === "提問者" || normalized === "回應者") {
+    return "speaker-student";
+  }
+  return "speaker-generic";
+}
+
+function parseTranscriptLine(paragraph) {
+  const match = String(paragraph || "").match(/^([^：:]{1,12})[：:]\s*(.+)$/);
+  if (!match) {
+    return {
+      kind: "plain",
+      text: String(paragraph || "").trim()
+    };
+  }
+
+  return {
+    kind: "speaker",
+    speaker: match[1].trim(),
+    text: match[2].trim()
+  };
+}
+
+function splitClosingSummary(paragraphs = []) {
+  if (!Array.isArray(paragraphs) || paragraphs.length === 0) {
+    return { body: [], closingSummary: "" };
+  }
+
+  const items = [...paragraphs];
+  const last = String(items.at(-1) || "").trim();
+  const summaryMatch = last.match(/^段落小結[：:]\s*(.+)$/);
+  if (!summaryMatch) {
+    return { body: items, closingSummary: "" };
+  }
+
+  items.pop();
+  return {
+    body: items,
+    closingSummary: summaryMatch[1].trim()
+  };
+}
+
 function fillText(id, value) {
   const element = document.getElementById(id);
   if (element) {
@@ -116,6 +168,9 @@ function renderSections(sections = []) {
     if (section.tag) {
       meta.append(createBadge(section.tag));
     }
+    if (section.kind) {
+      meta.append(createBadge(section.kind));
+    }
 
     const highlightList = node.querySelector(".highlight-list");
     highlightList.replaceChildren(...(section.highlights || []).map((item) => {
@@ -131,12 +186,35 @@ function renderSections(sections = []) {
       quoteBlock.hidden = true;
     }
 
+    const { body, closingSummary } = splitClosingSummary(section.transcript || []);
     const transcriptContainer = node.querySelector(".transcript-paragraphs");
-    transcriptContainer.replaceChildren(...(section.transcript || []).map((paragraph) => {
+    transcriptContainer.replaceChildren(...body.map((paragraph) => {
+      const parsed = parseTranscriptLine(paragraph);
       const p = document.createElement("p");
-      p.textContent = paragraph;
+      p.className = "transcript-line";
+      if (parsed.kind === "speaker") {
+        const speaker = document.createElement("span");
+        speaker.className = `speaker-label ${normalizeSpeakerClass(parsed.speaker)}`;
+        speaker.textContent = `${parsed.speaker}：`;
+
+        const text = document.createElement("span");
+        text.className = "speaker-text";
+        text.textContent = parsed.text;
+        p.append(speaker, text);
+        return p;
+      }
+
+      p.textContent = parsed.text;
       return p;
     }));
+
+    const closingSummaryBlock = node.querySelector(".closing-summary");
+    if (section.closingSummary || closingSummary) {
+      node.querySelector(".closing-summary-text").textContent = section.closingSummary || closingSummary;
+      closingSummaryBlock.hidden = false;
+    } else {
+      closingSummaryBlock.hidden = true;
+    }
 
     const voiceNote = node.querySelector(".voice-note");
     if (section.voiceNote) {

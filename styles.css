@@ -13,6 +13,8 @@
   --radius-lg: 28px;
   --radius-md: 18px;
   --radius-sm: 12px;
+  --font-sans: "PingFang TC", "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif;
+  --font-serif: "Songti TC", "PMingLiU", "Times New Roman", serif;
 }
 
 * {
@@ -31,7 +33,7 @@ body {
     radial-gradient(circle at top left, rgba(168, 127, 56, 0.18), transparent 34%),
     radial-gradient(circle at 85% 10%, rgba(39, 70, 62, 0.16), transparent 28%),
     linear-gradient(180deg, #f8f1e5 0%, #efe5d5 48%, #f3ecdf 100%);
-  font-family: "IBM Plex Sans TC", sans-serif;
+  font-family: var(--font-sans);
 }
 
 body::before {
@@ -102,7 +104,7 @@ body::before {
 .rail-panel h2,
 .segment-title {
   margin: 0;
-  font-family: "Cormorant Garamond", serif;
+  font-family: var(--font-serif);
   line-height: 0.95;
   letter-spacing: -0.03em;
 }
@@ -238,7 +240,7 @@ body::before {
 .toc-toggle strong {
   display: block;
   margin-top: 10px;
-  font-family: "Noto Serif TC", serif;
+  font-family: var(--font-serif);
   font-size: 1.1rem;
   color: var(--ink);
 }
@@ -299,7 +301,7 @@ body::before {
 }
 
 .section-link strong {
-  font-family: "Noto Serif TC", serif;
+  font-family: var(--font-serif);
   font-size: 1.02rem;
   font-weight: 700;
 }
@@ -357,7 +359,7 @@ body::before {
   display: flex;
   align-items: start;
   justify-content: center;
-  font-family: "Cormorant Garamond", serif;
+  font-family: var(--font-serif);
   font-size: 3rem;
   color: rgba(143, 60, 47, 0.78);
 }
@@ -402,6 +404,7 @@ body::before {
 
 .highlight-block,
 .transcript-block,
+.closing-summary,
 .voice-note,
 .quote-block {
   padding: 18px 18px 18px 20px;
@@ -417,10 +420,22 @@ body::before {
 
 .quote-text {
   margin: 12px 0 0;
-  font-family: "Noto Serif TC", serif;
+  font-family: var(--font-serif);
   font-size: 1.05rem;
   line-height: 1.9;
   color: var(--ink);
+}
+
+.closing-summary {
+  background: rgba(39, 70, 62, 0.08);
+  border-color: rgba(39, 70, 62, 0.18);
+}
+
+.closing-summary-text {
+  margin: 10px 0 0;
+  color: var(--ink);
+  font-weight: 600;
+  line-height: 1.72;
 }
 
 .transcript-paragraphs {
@@ -434,6 +449,39 @@ body::before {
 
 .transcript-paragraphs p + p {
   margin-top: 14px;
+}
+
+.transcript-line {
+  margin: 0;
+}
+
+.speaker-label {
+  margin-right: 0.45rem;
+  font-weight: 700;
+}
+
+.speaker-text {
+  color: var(--ink);
+}
+
+.speaker-yijie {
+  color: var(--forest);
+}
+
+.speaker-deyi {
+  color: #7c4a18;
+}
+
+.speaker-weiqi {
+  color: #385c96;
+}
+
+.speaker-student {
+  color: var(--accent);
+}
+
+.speaker-generic {
+  color: var(--gold);
 }
 
 .voice-note-text {
